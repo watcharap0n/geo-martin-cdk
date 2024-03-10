@@ -1,5 +1,6 @@
 stages:
   - source-scan
+  - deploy-ecr-prod
   - deploy-cdk-prod-MartinEoapiStack
 variables:
   DOCKER_DRIVER: overlay2
@@ -15,6 +16,42 @@ source-code-scan:
     - master
   script:
     - sonar-scanner -Dsonar.projectKey=${CI_PROJECT_NAMESPACE}--${CI_PROJECT_NAME} -Dsonar.sources=. -Dsonar.host.url=https://madrid.thaicom.io/sonar  -Dsonar.login=$SONAR_ID
+
+ploy_ecr_prod:
+  stage: deploy-ecr-prod
+  tags:
+    - docker-runner
+  when: manual
+  image: docker:24.0.5
+  # image: ubuntu-2204:2022.04.2
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  only:
+    - master
+  variables:
+    ECR_NAME: martin-eoapi-prod
+    ECR_TAG: latest
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_PROD}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_PROD}
+    - export AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID_PROD}
+    - export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+    - docker info
+    - apk add --no-cache curl jq python3 py3-pip
+    - pip install awscli
+    - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+    - aws ecr describe-repositories --repository-names ${ECR_NAME} || aws ecr create-repository --repository-name ${ECR_NAME}
+    - aws --version
+    - docker --version
+  script:
+    - cd dependencies/dockerfile
+    - cp config.yaml.prod config.yaml
+    - docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_NAME}:${ECR_TAG} .
+    - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_NAME}:${ECR_TAG}
 
 
 deploy_cdk_prod_MartinEoapiStack:
