@@ -17,7 +17,7 @@ source-code-scan:
   script:
     - sonar-scanner -Dsonar.projectKey=${CI_PROJECT_NAMESPACE}--${CI_PROJECT_NAME} -Dsonar.sources=. -Dsonar.host.url=https://madrid.thaicom.io/sonar  -Dsonar.login=$SONAR_ID
 
-ploy_ecr_prod:
+deploy_ecr_prod:
   stage: deploy-ecr-prod
   tags:
     - docker-runner
@@ -48,7 +48,7 @@ ploy_ecr_prod:
     - aws --version
     - docker --version
   script:
-    - cd dependencies/dockerfile
+    - cd dependencies/docker
     - cp config.yaml.prod config.yaml
     - docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_NAME}:${ECR_TAG} .
     - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_NAME}:${ECR_TAG}
