@@ -1,6 +1,6 @@
 stages:
   - source-scan
-  - deploy-cdk-prod-OroratechSummaryStack
+  - deploy-cdk-prod-MartinEoapiStack
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_HOST: tcp://docker:2375
@@ -17,8 +17,8 @@ source-code-scan:
     - sonar-scanner -Dsonar.projectKey=${CI_PROJECT_NAMESPACE}--${CI_PROJECT_NAME} -Dsonar.sources=. -Dsonar.host.url=https://madrid.thaicom.io/sonar  -Dsonar.login=$SONAR_ID
 
 
-deploy_cdk_prod_OroratechSummaryStack:
-  stage: deploy-cdk-prod-OroratechSummaryStack
+deploy_cdk_prod_MartinEoapiStack:
+  stage: deploy-cdk-prod-MartinEoapiStack
   tags:
     - docker-runner
   when: manual
@@ -36,4 +36,4 @@ deploy_cdk_prod_OroratechSummaryStack:
     - echo deploy_cdk_prod
     - python -m pip install -r requirements.txt
     - cdk bootstrap aws://${AWS_ACCOUNT_ID_PROD}/${AWS_DEFAULT_REGION}
-    - cdk deploy --require-approval never OroratechSummaryStack
+    - cdk deploy --require-approval never MartinEoapiStack
