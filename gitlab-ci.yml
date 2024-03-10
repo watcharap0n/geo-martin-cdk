@@ -1,0 +1,39 @@
+stages:
+  - source-scan
+  - deploy-cdk-prod-OroratechSummaryStack
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
+source-code-scan:
+  stage: source-scan
+  tags:
+    - docker-runner
+  image: sonarsource/sonar-scanner-cli:latest
+  only:
+    - master
+  script:
+    - sonar-scanner -Dsonar.projectKey=${CI_PROJECT_NAMESPACE}--${CI_PROJECT_NAME} -Dsonar.sources=. -Dsonar.host.url=https://madrid.thaicom.io/sonar  -Dsonar.login=$SONAR_ID
+
+
+deploy_cdk_prod_OroratechSummaryStack:
+  stage: deploy-cdk-prod-OroratechSummaryStack
+  tags:
+    - docker-runner
+  when: manual
+  image: rome.thaicom.io/aws-cdk-python:2.95.1
+  only:
+    - master
+  before_script:
+    - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_PROD}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_PROD}
+    - export AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID_PROD}
+    - cp $ENV_FILE_PROD .env
+    - export ENV_FILE_PATH=.env
+    - cdk --version
+  script:
+    - echo deploy_cdk_prod
+    - python -m pip install -r requirements.txt
+    - cdk bootstrap aws://${AWS_ACCOUNT_ID_PROD}/${AWS_DEFAULT_REGION}
+    - cdk deploy --require-approval never OroratechSummaryStack
