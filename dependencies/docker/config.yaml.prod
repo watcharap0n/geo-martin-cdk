@@ -44,6 +44,8 @@ postgres:
   auto_publish:
     # Optionally limit to just these schemas
     from_schemas:
+      - public
+      - ororatech
       - landuse
     # Here we enable both tables and functions auto discovery.
     # You can also enable just one of them by not mentioning the other,
@@ -51,9 +53,12 @@ postgres:
     # E.g. `tables: false` enables just the functions auto-discovery.
     tables:
       # Optionally set how source ID should be generated based on the table's name, schema, and geometry column
-      source_id_format: '{table}'
+      source_id_format: '{schema}.{table}'
       # Add more schemas to the ones listed above
-      from_schemas: landuse
+      from_schemas:
+        - public
+        - ororatech
+        - landuse
       # A table column to use as the feature ID
       # If a table has no column with this name, `id_column` will not be set for that table.
       # If a list of strings is given, the first found column will be treated as a feature ID.
@@ -66,7 +71,7 @@ postgres:
       extent: 4096
     functions:
       # Optionally set how source ID should be generated based on the function's name and schema
-      source_id_format: '{function}'
+      source_id_format: '{schema}.{function}'
 
       
   # Associative arrays of table sources
