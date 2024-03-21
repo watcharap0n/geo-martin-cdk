@@ -51,7 +51,12 @@ class MartinStack(Stack):
         self.network_configuration(vpc_id=self.vpc_id)  # 1. Create network configuration (required)
         self.iam_role(role_arn=self.execution_role_arn)  # 2. Create IAM role (required)
         self.cluster_configuration(cluster_name=self.cluster_name)  # 3. Create ECS cluster (required)
-        self.task_configuration(image_uri=self.image_uri)  # 4. Create ECS task definition (required)
+        self.task_configuration(
+            image_uri=self.image_uri,
+            cpu=int(self.ecs_cpu),
+            memory=int(self.ecs_memory),
+            port=3000
+        )  # 4. Create ECS task definition (required)
         self.fargate_service_configuration(service_name=self.service_name)  # 5. Add Fargate service (optional)
         self.load_balancer_configuration(
             load_balancer_name=self.load_balancer_name)  # 6. (Optional) If you want to expose the service via ALB (Application Load Balancer) **But if you add this, you need to add api_gateway_configuration() to expose the service together **
