@@ -13,5 +13,5 @@ load_dotenv(
 ENV = cdk.Environment(region=os.environ.get('AWS_DEFAULT_REGION'), account=os.environ.get('AWS_ACCOUNT_ID'))
 app = cdk.App()
 
-MartinStack(app, "MartinEoapiStack", env=ENV)
+MartinStack(app, os.environ.get('STACK_NAME'), env=ENV)
 app.synth()
