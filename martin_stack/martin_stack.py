@@ -192,6 +192,7 @@ class MartinStack(Stack):
             service_name=service_name,
             security_groups=[self.__security_group]
         )
+        print(f"Service Name: {service_name}")
 
     def load_balancer_configuration(self,
                                     load_balancer_name: str,
@@ -219,6 +220,7 @@ class MartinStack(Stack):
         END HTTPS 443 PORT
         """
 
+        print(f"load_balancer_configuration assign_public_ip: {assign_public_ip}")
         self.alb = elbv2.ApplicationLoadBalancer(
             self,
             'AlbMartin',
@@ -241,6 +243,7 @@ class MartinStack(Stack):
                 unhealthy_threshold_count=3,
             )  # Health check at path /health to make sure the container is up
         )
+        print(f"Load Balancer Name: {load_balancer_name}")
 
     def api_gateway_configuration(self, api_name: str):
         """
