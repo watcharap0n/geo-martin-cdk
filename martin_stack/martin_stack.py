@@ -162,6 +162,7 @@ class MartinStack(Stack):
         """
         Add Fargate service without public IP but expose to public via API Gateway and ALB (Application Load Balancer)
         """
+        print(f"fargate_service_configuration VPC: {self.vpc_id}, Subnet Type: {private_with_nat}")
         self.__fargate_service = ecs.FargateService(
             self,
             'MARIN_FARGATE_SERVICE',
