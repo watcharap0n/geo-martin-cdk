@@ -66,8 +66,7 @@ class MartinStack(Stack):
                                            subnet_id=self.subnet_id)  # 5. Add Fargate service (optional)
         self.load_balancer_configuration(load_balancer_name=self.load_balancer_name,
                                          assign_public_ip=self.assign_public_ip)  # 6. (Optional) If you want to expose the service via ALB (Application Load Balancer) **But if you add this, you need to add api_gateway_configuration() to expose the service together **
-        self.api_gateway_configuration(
-            api_name=self.api_name)  # 7. (Optional) Add API Gateway to expose the service to the public **But if you add this, you need to add load_balancer_configuration() to expose the service together **
+        self.api_gateway_configuration(api_name=self.api_name)  # 7. (Optional) Add API Gateway to expose the service to the public **But if you add this, you need to add load_balancer_configuration() to expose the service together **
 
     def network_configuration(self, vpc_id: str):
         """
@@ -250,6 +249,7 @@ class MartinStack(Stack):
         Add API Gateway to expose the service to the public
         """
         # Add CORS options
+        print(f"api_gateway_configuration api_name: {api_name}")
         cors_options = apigwv2_alpha.CorsPreflightOptions(
             allow_origins=['*'],
             allow_headers=['*'],
@@ -277,6 +277,7 @@ class MartinStack(Stack):
                 self.listener,
             ),
         )
+        print(f"API Name: {api_name}")
 
         """
         Things to manually do after the stack is created:
