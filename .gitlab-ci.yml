@@ -131,5 +131,5 @@ deploy_cdk_prod_carbon_MartinEoapiStack:
   script:
     - echo deploy_cdk_prod
     - python -m pip install -r requirements.txt
-    - cdk bootstrap aws://${AWS_ACCOUNT_ID_CARBON_PROD}/${AWS_DEFAULT_REGION}
+    # - cdk bootstrap aws://${AWS_ACCOUNT_ID_CARBON_PROD}/${AWS_DEFAULT_REGION}
     - cdk deploy --require-approval never MartinEoapiStack
