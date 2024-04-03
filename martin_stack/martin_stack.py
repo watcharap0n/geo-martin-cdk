@@ -36,6 +36,7 @@ class MartinStack(Stack):
         self.ecs_memory = os.environ.get('ECS_MEMORY')
         self.load_balancer_name = os.environ.get('LOAD_BALANCER_NAME')
         self.api_name = os.environ.get('API_NAME')
+        self.private_with_nat = os.environ.get('PRIVATE_WITH_NAT', True)
 
         # private variables
         self.__vpc = None
@@ -57,7 +58,7 @@ class MartinStack(Stack):
             memory=int(self.ecs_memory),
             port=3000
         )  # 4. Create ECS task definition (required)
-        self.fargate_service_configuration(service_name=self.service_name)  # 5. Add Fargate service (optional)
+        self.fargate_service_configuration(service_name=self.service_name, private_with_nat=self.private_with_nat)  # 5. Add Fargate service (optional)
         self.load_balancer_configuration(
             load_balancer_name=self.load_balancer_name)  # 6. (Optional) If you want to expose the service via ALB (Application Load Balancer) **But if you add this, you need to add api_gateway_configuration() to expose the service together **
         self.api_gateway_configuration(
@@ -155,7 +156,8 @@ class MartinStack(Stack):
     def fargate_service_configuration(
             self,
             service_name: str,
-            assign_public_ip: Optional[bool] = False
+            assign_public_ip: Optional[bool] = False,
+            private_with_nat: Optional[bool] = True
     ):
         """
         Add Fargate service without public IP but expose to public via API Gateway and ALB (Application Load Balancer)
@@ -167,7 +169,7 @@ class MartinStack(Stack):
             task_definition=self.__task_definition,
             platform_version=ecs.FargatePlatformVersion.VERSION1_3,
             vpc_subnets=ec2.SubnetSelection(
-                subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),  # Contain private subnet with NAT gateway
+                subnet_type=ec2.SubnetType.PRIVATE_ISOLATED if not private_with_nat else ec2.SubnetType.PRIVATE_WITH_EGRESS),
             desired_count=1,
             assign_public_ip=assign_public_ip,
             service_name=service_name,

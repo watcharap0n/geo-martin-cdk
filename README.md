@@ -114,6 +114,7 @@ LOAD_BALANCER_NAME=martin-eoapi-alb-dev
 SERVICE_NAME=martin-eoapi-dev-service
 IMAGE_URI="811478435729.dkr.ecr.ap-southeast-1.amazonaws.com/martin-eoapi-dev:latest"
 STACK_NAME=martin-eoapi-service
+PRIVATE_WITH_NAT=true
 ```
 
 ## First Time Setup
@@ -125,7 +126,6 @@ STACK_NAME=martin-eoapi-service
 $ docker build -t martin-dev .
 $ docker tag martin-dev:latest {AWS_ACCOUNT_ID}.dkr.ecr.{AWS_DEFAULT_REGION}.amazonaws.com/martin-eoapi-dev:latest
 $ docker push {AWS_ACCOUNT_ID}.dkr.ecr.{AWS_DEFAULT_REGION}.amazonaws.com/martin-eoapi-dev:latest
-$ cdk deploy
 ```
 
 ## Deploy the stack
