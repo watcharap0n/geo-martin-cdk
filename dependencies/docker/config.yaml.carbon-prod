@@ -5,18 +5,18 @@ keep_alive: 75
 listen_addresses: '0.0.0.0:3000'
 
 # Number of web server workers
-worker_processes: 8
+worker_processes: 4
 
 # Amount of memory (in MB) to use for caching tiles [default: 512, 0 to disable]
-cache_size_mb: 1024
+cache_size_mb: 2048
 
 # Database configuration. This can also be a list of PG configs.
 postgres:
   # Database connection string. You can use env vars too, for example:
   #   $DATABASE_URL
   #   ${DATABASE_URL:-postgresql://postgres@localhost/db}
-  connection_string: 'postgresql://postgres:tCb2uV73Hq7Yul5RO3hKO8dOVsDyM354@carboncredit-prod.cluster-czhabhrzg7jw.ap-southeast-1.rds.amazonaws.com:5432/postgres'
-
+  #  connection_string: "postgresql://postgres:O4Go1qW<%#LG8O|{H<JACom%hrbc@demo-psql-1.cluster-crtjk9tnsbgn.ap-southeast-1.rds.amazonaws.com:5432/postgres"
+  connection_string: "postgresql://postgres:tCb2uV73Hq7Yul5RO3hKO8dOVsDyM354@carboncredit-prod.cluster-czhabhrzg7jw.ap-southeast-1.rds.amazonaws.com:5432/postgres"
   # Same as PGSSLCERT for psql
   # ssl_cert: './postgresql.crt'
   # Same as PGSSLKEY for psql
@@ -31,7 +31,7 @@ postgres:
   pool_size: 20
 
   # Limit the number of table geo features included in a tile. Unlimited by default.
-  max_feature_count: 1000
+  max_feature_count: 2000
 
   # Control the automatic generation of bounds for spatial tables [default: quick]
   # 'calc' - compute table geometry bounds on startup.
@@ -45,8 +45,7 @@ postgres:
     # Optionally limit to just these schemas
     from_schemas:
       - public
-      - ororatech
-      - landuse
+      - carboncredit
     # Here we enable both tables and functions auto discovery.
     # You can also enable just one of them by not mentioning the other,
     # or setting it to false.  Setting one to true disables the other one as well.
@@ -57,12 +56,11 @@ postgres:
       # Add more schemas to the ones listed above
       from_schemas:
         - public
-        - ororatech
-        - landuse
+        - carboncredit
       # A table column to use as the feature ID
       # If a table has no column with this name, `id_column` will not be set for that table.
       # If a list of strings is given, the first found column will be treated as a feature ID.
-      id_columns: feature_id
+      id_columns: id
       # Boolean to control if geometries should be clipped or encoded as is, optional, default to true
       clip_geom: true
       # Buffer distance in tile coordinate space to optionally clip geometries, optional, default to 64
@@ -73,93 +71,93 @@ postgres:
       # Optionally set how source ID should be generated based on the function's name and schema
       source_id_format: '{schema}.{function}'
 
-      
-  # Associative arrays of table sources
-#  tables:
-#    data_sources:
-#      # ID of the MVT layer (optional, defaults to table name)
-#      layer_id: data_sources
-#
-#      # Table schema (required)
-#      schema: landuse
-#
-#      # Table name (required)
-#      table: data_sources
-#
-#      # Geometry SRID (required)
-#      srid: 4326
-#
-#      # Geometry column name (required)
-#      geometry_column: geometry
-#
-#      # Feature id column name
-#      id_column: ~
-#
-#      # An integer specifying the minimum zoom level
-#      minzoom: 0
-#
-#      # An integer specifying the maximum zoom level. MUST be >= minzoom
-#      maxzoom: 30
-#
-#      # The maximum extent of available map tiles. Bounds MUST define an area
-#      # covered by all zoom levels. The bounds are represented in WGS:84
-#      # latitude and longitude values, in the order left, bottom, right, top.
-#      # Values may be integers or floating point numbers.
-#      bounds: [-180.0, -90.0, 180.0, 90.0]
-#
-#      # Tile extent in tile coordinate space
-#      extent: 4096
-#
-#      # Buffer distance in tile coordinate space to optionally clip geometries
-#      buffer: 64
-#
-#      # Boolean to control if geometries should be clipped or encoded as is
-#      clip_geom: true
-#
-#      # Geometry type
-#      geometry_type: GEOMETRY
-#
-#      # List of columns, that should be encoded as tile properties (required)
-#      properties:
-#        gid: int4
-  
-  # Associative arrays of function sources
-#  functions:
-#    fn_data_sources:
-#      # Schema name (required)
-#      schema: landuse
-#
-#      # Function name (required)
-#      function: fn_data_sources
-#
-#
-#      # An integer specifying the minimum zoom level
-#      minzoom: 0
-#
-#      # An integer specifying the maximum zoom level. MUST be >= minzoom
-#      maxzoom: 30
-#
-#      # The maximum extent of available map tiles. Bounds MUST define an area
-#      # covered by all zoom levels. The bounds are represented in WGS:84
-#      # latitude and longitude values, in the order left, bottom, right, top.
-#      # Values may be integers or floating point numbers.
-#      bounds: [-180.0, -90.0, 180.0, 90.0]
 
-# Publish PMTiles files from local disk or proxy to a web server
-# pmtiles:
-#   paths:
-#     # scan this whole dir, matching all *.pmtiles files
-#     - /dir-path
-#     # specific pmtiles file will be published as a pmt source (filename without extension)
-#     - /path/to/pmt.pmtiles
-#     # A web server with a PMTiles file that supports range requests
-#     - https://example.org/path/tiles.pmtiles
-#   sources:
-#     # named source matching source name to a single file
-#     pm-src1: /path/to/pmt.pmtiles
-#     # A named source to a web server with a PMTiles file that supports range requests
-#     pm-web2: https://example.org/path/tiles.pmtiles
-    
+    # Associative arrays of table sources
+    #  tables:
+    #    table_source_id:
+    #      # ID of the MVT layer (optional, defaults to table name)
+    #      layer_id: id
+    #
+    #      # Table schema (required)
+    #      schema: carboncredit
+    #
+    #      # Table name (required)
+    #      table: models
+    #
+    #      # Geometry SRID (required)
+    #      srid: 4326
+    #
+    #      # Geometry column name (required)
+    #      geometry_column: geometry
+    #
+    #      # Feature id column name
+    #      id_column: ~
+    #
+    #      # An integer specifying the minimum zoom level
+    #      minzoom: 6
+    #
+    #      # An integer specifying the maximum zoom level. MUST be >= minzoom
+    #      maxzoom: 12
+    #
+    #      # The maximum extent of available map tiles. Bounds MUST define an area
+    #      # covered by all zoom levels. The bounds are represented in WGS:84
+    #      # latitude and longitude values, in the order left, bottom, right, top.
+    #      # Values may be integers or floating point numbers.
+    #      bounds: [97.34335847100004, 5.613037873000053, 105.63696451800007, 20.46507381500004]
+    #
+    #      # Tile extent in tile coordinate space
+    #      extent: 4096
+    #
+    #      # Buffer distance in tile coordinate space to optionally clip geometries
+    #      buffer: 64
+    #
+    #      # Boolean to control if geometries should be clipped or encoded as is
+    #      clip_geom: true
+    #
+    #      # Geometry type
+    #      geometry_type: GEOMETRY
+    #
+    #      # List of columns, that should be encoded as tile properties (required)
+    #      properties:
+    #        gid: int4
+
+    ##   Associative arrays of function sources
+    #  functions:
+    #    fn_data_sources:
+    #      # Schema name (required)
+    #      schema: landuse
+    #
+    #      # Function name (required)
+    #      function: fn_data_sources
+    #
+    #
+    #      # An integer specifying the minimum zoom level
+    #      minzoom: 0
+    #
+    #      # An integer specifying the maximum zoom level. MUST be >= minzoom
+    #      maxzoom: 30
+    #
+    #      # The maximum extent of available map tiles. Bounds MUST define an area
+    #      # covered by all zoom levels. The bounds are represented in WGS:84
+    #      # latitude and longitude values, in the order left, bottom, right, top.
+    #      # Values may be integers or floating point numbers.
+    #      bounds: [-180.0, -90.0, 180.0, 90.0]
+
+    # Publish PMTiles files from local disk or proxy to a web server
+    # pmtiles:
+    #   paths:
+    #     # scan this whole dir, matching all *.pmtiles files
+    #     - /dir-path
+    #     # specific pmtiles file will be published as a pmt source (filename without extension)
+    #     - /path/to/pmt.pmtiles
+    #     # A web server with a PMTiles file that supports range requests
+    #     - https://example.org/path/tiles.pmtiles
+    #   sources:
+    #     # named source matching source name to a single file
+    #     pm-src1: /path/to/pmt.pmtiles
+    #     # A named source to a web server with a PMTiles file that supports range requests
+    #     pm-web2: https://example.org/path/tiles.pmtiles
+
 # # Publish MBTiles files
 # mbtiles:
 #   paths:
