@@ -15,7 +15,7 @@ postgres:
   # Database connection string. You can use env vars too, for example:
   #   $DATABASE_URL
   #   ${DATABASE_URL:-postgresql://postgres@localhost/db}
-  connection_string: 'postgresql://postgres:tCb2uV73Hq7Yul5RO3hKO8dOVsDyM354@carboncredit-prod.cluster-czhabhrzg7jw.ap-southeast-1.rds.amazonaws.com:5432/carboncredit2024Prod'
+  connection_string: 'postgresql://postgres:tCb2uV73Hq7Yul5RO3hKO8dOVsDyM354@carboncredit-prod.cluster-czhabhrzg7jw.ap-southeast-1.rds.amazonaws.com:5432/postgres'
 
   # Same as PGSSLCERT for psql
   # ssl_cert: './postgresql.crt'
