@@ -37,6 +37,7 @@ class MartinStack(Stack):
         self.load_balancer_name = os.environ.get('LOAD_BALANCER_NAME')
         self.api_name = os.environ.get('API_NAME')
         self.private_with_nat = self.str_to_bool(s=os.environ.get('PRIVATE_WITH_NAT', 'True'))
+        self.subnet_id = os.environ.get('SUBNET_ID')
 
         # private variables
         self.__vpc = None
@@ -58,7 +59,7 @@ class MartinStack(Stack):
             memory=int(self.ecs_memory),
             port=3000
         )  # 4. Create ECS task definition (required)
-        self.fargate_service_configuration(service_name=self.service_name, private_with_nat=self.private_with_nat)  # 5. Add Fargate service (optional)
+        self.fargate_service_configuration(service_name=self.service_name, private_with_nat=self.private_with_nat, subnet_id=self.subnet_id)  # 5. Add Fargate service (optional)
         self.load_balancer_configuration(
             load_balancer_name=self.load_balancer_name)  # 6. (Optional) If you want to expose the service via ALB (Application Load Balancer) **But if you add this, you need to add api_gateway_configuration() to expose the service together **
         self.api_gateway_configuration(
@@ -157,13 +158,16 @@ class MartinStack(Stack):
             self,
             service_name: str,
             assign_public_ip: Optional[bool] = False,
-            private_with_nat: Optional[bool] = True
+            private_with_nat: Optional[bool] = True,
+            subnet_id: Optional[str] = None
     ):
         """
         Add Fargate service without public IP but expose to public via API Gateway and ALB (Application Load Balancer)
         """
+        if private_with_nat is False and subnet_id is None:
+            raise ValueError("Subnet ID is required if you want to deploy the service in public subnet")
         print(type(private_with_nat), private_with_nat)
-        subnet_type = ec2.SubnetType.PRIVATE_ISOLATED if private_with_nat is False else ec2.SubnetType.PRIVATE_WITH_EGRESS
+        subnet_type = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS) if private_with_nat is True else ec2.SubnetSelection(subnets=[ec2.PrivateSubnet.from_subnet_id(self, 'Subnet', subnet_id)])
 
         print(f"fargate_service_configuration VPC: {self.vpc_id}, Subnet Type: {subnet_type}")
 
@@ -173,8 +177,7 @@ class MartinStack(Stack):
             cluster=self.__cluster,
             task_definition=self.__task_definition,
             platform_version=ecs.FargatePlatformVersion.VERSION1_3,
-            vpc_subnets=ec2.SubnetSelection(
-                subnet_type=subnet_type, ),
+            vpc_subnets=subnet_type,
             desired_count=1,
             assign_public_ip=assign_public_ip,
             service_name=service_name,

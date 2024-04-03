@@ -115,6 +115,7 @@ SERVICE_NAME=martin-eoapi-dev-service
 IMAGE_URI="811478435729.dkr.ecr.ap-southeast-1.amazonaws.com/martin-eoapi-dev:latest"
 STACK_NAME=martin-eoapi-service
 PRIVATE_WITH_NAT=true
+SUBNET_ID="subnet-09fbe2ab7fe358c75"
 ```
 
 ## First Time Setup
