@@ -55,7 +55,7 @@ deploy_ecr_prod:
     - docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_NAME}:${ECR_TAG} .
     - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_NAME}:${ECR_TAG}
 
-deploy_ecr_carbn_prod:
+deploy_ecr_carbon_prod:
   stage: deploy-ecr-carbon-prod
   tags:
     - docker-runner
@@ -86,7 +86,7 @@ deploy_ecr_carbn_prod:
     - docker --version
   script:
     - cd dependencies/docker
-    - cp config.yaml.prod config.yaml
+    - cp config.yaml.carbon-prod config.yaml
     - docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_NAME}:${ECR_TAG} .
     - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_NAME}:${ECR_TAG}
 
@@ -110,4 +110,25 @@ deploy_cdk_prod_MartinEoapiStack:
     - echo deploy_cdk_prod
     - python -m pip install -r requirements.txt
     - cdk bootstrap aws://${AWS_ACCOUNT_ID_PROD}/${AWS_DEFAULT_REGION}
+    - cdk deploy --require-approval never MartinEoapiStack
+
+deploy_cdk_prod_carbon_MartinEoapiStack:
+  stage: deploy-cdk-carbon-prod-MartinEoapiStack
+  tags:
+    - docker-runner
+  when: manual
+  image: rome.thaicom.io/aws-cdk-python:2.95.1
+  only:
+    - master
+  before_script:
+    - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_CARBON_PROD}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_CARBON_PROD}
+    - export AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID_CARBON_PROD}
+    - cp $ENV_FILE_CARBON_PROD .env
+    - export ENV_FILE_PATH=.env
+    - cdk --version
+  script:
+    - echo deploy_cdk_prod
+    - python -m pip install -r requirements.txt
+    - cdk bootstrap aws://${AWS_ACCOUNT_ID_CARBON_PROD}/${AWS_DEFAULT_REGION}
     - cdk deploy --require-approval never MartinEoapiStack
