@@ -162,7 +162,8 @@ class MartinStack(Stack):
         """
         Add Fargate service without public IP but expose to public via API Gateway and ALB (Application Load Balancer)
         """
-        print(f"fargate_service_configuration VPC: {self.vpc_id}, Subnet Type: {private_with_nat}")
+        subnet_type = ec2.SubnetType.PRIVATE_ISOLATED if not private_with_nat else ec2.SubnetType.PRIVATE_WITH_EGRESS
+        print(f"fargate_service_configuration VPC: {self.vpc_id}, Subnet Type: {subnet_type}")
         self.__fargate_service = ecs.FargateService(
             self,
             'MARIN_FARGATE_SERVICE',
@@ -170,7 +171,7 @@ class MartinStack(Stack):
             task_definition=self.__task_definition,
             platform_version=ecs.FargatePlatformVersion.VERSION1_3,
             vpc_subnets=ec2.SubnetSelection(
-                subnet_type=ec2.SubnetType.PRIVATE_ISOLATED if not private_with_nat else ec2.SubnetType.PRIVATE_WITH_EGRESS),
+                subnet_type=subnet_type),
             desired_count=1,
             assign_public_ip=assign_public_ip,
             service_name=service_name,
