@@ -36,6 +36,7 @@ class MartinStack(Stack):
         self.ecs_memory = os.environ.get('ECS_MEMORY')
         self.load_balancer_name = os.environ.get('LOAD_BALANCER_NAME')
         self.api_name = os.environ.get('API_NAME')
+        self.assign_public_ip = self.str_to_bool(s=os.environ.get('ASSIGN_PUBLIC_IP', 'False'))
         self.private_with_nat = self.str_to_bool(s=os.environ.get('PRIVATE_WITH_NAT', 'True'))
         self.subnet_id = os.environ.get('SUBNET_ID')
 
@@ -59,9 +60,12 @@ class MartinStack(Stack):
             memory=int(self.ecs_memory),
             port=3000
         )  # 4. Create ECS task definition (required)
-        self.fargate_service_configuration(service_name=self.service_name, private_with_nat=self.private_with_nat, subnet_id=self.subnet_id)  # 5. Add Fargate service (optional)
-        self.load_balancer_configuration(
-            load_balancer_name=self.load_balancer_name)  # 6. (Optional) If you want to expose the service via ALB (Application Load Balancer) **But if you add this, you need to add api_gateway_configuration() to expose the service together **
+        self.fargate_service_configuration(service_name=self.service_name,
+                                           assign_public_ip=self.assign_public_ip,
+                                           private_with_nat=self.private_with_nat,
+                                           subnet_id=self.subnet_id)  # 5. Add Fargate service (optional)
+        self.load_balancer_configuration(load_balancer_name=self.load_balancer_name,
+                                         assign_public_ip=self.assign_public_ip)  # 6. (Optional) If you want to expose the service via ALB (Application Load Balancer) **But if you add this, you need to add api_gateway_configuration() to expose the service together **
         self.api_gateway_configuration(
             api_name=self.api_name)  # 7. (Optional) Add API Gateway to expose the service to the public **But if you add this, you need to add load_balancer_configuration() to expose the service together **
 
@@ -167,7 +171,12 @@ class MartinStack(Stack):
         if private_with_nat is False and subnet_id is None:
             raise ValueError("Subnet ID is required if you want to deploy the service in public subnet")
         print(type(private_with_nat), private_with_nat)
-        subnet_type = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS) if private_with_nat is True else ec2.SubnetSelection(subnets=[ec2.Subnet.from_subnet_id(self, 'Subnet', subnet_id)])
+        if assign_public_ip is False:
+            subnet_type = ec2.SubnetSelection(
+                subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS) if private_with_nat is True else ec2.SubnetSelection(
+                subnets=[ec2.Subnet.from_subnet_id(self, 'Subnet', subnet_id)])
+        else:
+            subnet_type = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
 
         print(f"fargate_service_configuration VPC: {self.vpc_id}, Subnet Type: {subnet_type}")
 
@@ -186,6 +195,7 @@ class MartinStack(Stack):
 
     def load_balancer_configuration(self,
                                     load_balancer_name: str,
+                                    assign_public_ip: Optional[bool] = False,
                                     health_check_path: Optional[str] = '/health',
                                     port: Optional[int] = 80):
         """
@@ -213,7 +223,7 @@ class MartinStack(Stack):
             self,
             'AlbMartin',
             vpc=self.__vpc,
-            internet_facing=False,  # Contain private subnet with NAT gateway
+            internet_facing=assign_public_ip,  # Contain private subnet with NAT gateway
             load_balancer_name=load_balancer_name
         )
 
@@ -264,7 +274,6 @@ class MartinStack(Stack):
                 self.listener,
             ),
         )
-
 
         """
         Things to manually do after the stack is created:
