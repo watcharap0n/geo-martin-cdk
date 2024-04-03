@@ -127,6 +127,7 @@ deploy_cdk_prod_carbon_MartinEoapiStack:
     - cp $ENV_FILE_CARBON_PROD .env
     - export ENV_FILE_PATH=.env
     - cdk --version
+    - cat .env
   script:
     - echo deploy_cdk_prod
     - python -m pip install -r requirements.txt
