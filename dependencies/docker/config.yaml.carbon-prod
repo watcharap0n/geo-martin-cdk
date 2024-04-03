@@ -16,7 +16,7 @@ postgres:
   #   $DATABASE_URL
   #   ${DATABASE_URL:-postgresql://postgres@localhost/db}
   #  connection_string: "postgresql://postgres:O4Go1qW<%#LG8O|{H<JACom%hrbc@demo-psql-1.cluster-crtjk9tnsbgn.ap-southeast-1.rds.amazonaws.com:5432/postgres"
-  connection_string: "postgresql://postgres:tCb2uV73Hq7Yul5RO3hKO8dOVsDyM354@carboncredit-prod.cluster-czhabhrzg7jw.ap-southeast-1.rds.amazonaws.com:5432/postgres"
+  connection_string: "postgresql://postgres:BnjUV4LsbtwOo38VNa585sAekEI1WbUZ@carboncredit-prod.cluster-czhabhrzg7jw.ap-southeast-1.rds.amazonaws.com:5432/postgres"
   # Same as PGSSLCERT for psql
   # ssl_cert: './postgresql.crt'
   # Same as PGSSLKEY for psql

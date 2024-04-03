@@ -167,16 +167,16 @@ class MartinStack(Stack):
         """
         Add Fargate service without public IP but expose to public via API Gateway and ALB (Application Load Balancer)
         """
-        if private_with_nat is False and subnet_id is None:
-            raise ValueError("Subnet ID is required if you want to deploy the service in public subnet")
+        # if private_with_nat is False and subnet_id is None:
+        #     raise ValueError("Subnet ID is required if you want to deploy the service in public subnet")
         print(type(private_with_nat), private_with_nat)
-        subnet_type = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_ISOLATED)
-        # if assign_public_ip is False:
-        #     subnet_type = ec2.SubnetSelection(
-        #         subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS) if private_with_nat is True else ec2.SubnetSelection(
-        #         subnets=[ec2.Subnet.from_subnet_id(self, 'Subnet', subnet_id)])
-        # else:
-        #     subnet_type = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
+        # subnet_type = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_ISOLATED)
+        if assign_public_ip is False:
+            subnet_type = ec2.SubnetSelection(
+                subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS) if private_with_nat is True else ec2.SubnetSelection(
+                subnets=[ec2.Subnet.from_subnet_id(self, 'Subnet', subnet_id)])
+        else:
+            subnet_type = ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
 
         print(f"fargate_service_configuration VPC: {self.vpc_id}, Subnet Type: {subnet_type}")
 
