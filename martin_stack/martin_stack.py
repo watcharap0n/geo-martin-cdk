@@ -36,7 +36,7 @@ class MartinStack(Stack):
         self.ecs_memory = os.environ.get('ECS_MEMORY')
         self.load_balancer_name = os.environ.get('LOAD_BALANCER_NAME')
         self.api_name = os.environ.get('API_NAME')
-        self.private_with_nat = os.environ.get('PRIVATE_WITH_NAT', True)
+        self.private_with_nat = self.str_to_bool(s=os.environ.get('PRIVATE_WITH_NAT', 'True'))
 
         # private variables
         self.__vpc = None
@@ -162,8 +162,11 @@ class MartinStack(Stack):
         """
         Add Fargate service without public IP but expose to public via API Gateway and ALB (Application Load Balancer)
         """
-        subnet_type = ec2.SubnetType.PRIVATE_ISOLATED if not private_with_nat else ec2.SubnetType.PRIVATE_WITH_EGRESS
+        print(type(private_with_nat), private_with_nat)
+        subnet_type = ec2.SubnetType.PRIVATE_ISOLATED if private_with_nat is False else ec2.SubnetType.PRIVATE_WITH_EGRESS
+
         print(f"fargate_service_configuration VPC: {self.vpc_id}, Subnet Type: {subnet_type}")
+
         self.__fargate_service = ecs.FargateService(
             self,
             'MARIN_FARGATE_SERVICE',
@@ -171,7 +174,7 @@ class MartinStack(Stack):
             task_definition=self.__task_definition,
             platform_version=ecs.FargatePlatformVersion.VERSION1_3,
             vpc_subnets=ec2.SubnetSelection(
-                subnet_type=subnet_type),
+                subnet_type=subnet_type, ),
             desired_count=1,
             assign_public_ip=assign_public_ip,
             service_name=service_name,
@@ -259,9 +262,15 @@ class MartinStack(Stack):
             ),
         )
 
+
         """
         Things to manually do after the stack is created:
         - Add API gateway to custom domain (if needed)
         - Add SSL certificate to the custom domain (if needed)
         - Add Route53 record to the custom domain (if needed)
         """
+
+    # Utility
+    @staticmethod
+    def str_to_bool(s: str) -> bool:
+        return s.lower() in ['true', 'True', '1', 't', 'y', 'yes']
