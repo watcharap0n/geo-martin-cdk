@@ -13,6 +13,7 @@ source-code-scan:
   stage: source-scan
   tags:
     - docker-runner
+  when: manual
   image: sonarsource/sonar-scanner-cli:latest
   only:
     - master
@@ -116,7 +117,7 @@ deploy_cdk_prod_carbon_MartinEoapiStack:
   stage: deploy-cdk-carbon-prod-MartinEoapiStack
   tags:
     - docker-runner
-  when: manual
+  # when: manual
   image: rome.thaicom.io/aws-cdk-python:2.95.1
   only:
     - master
