@@ -100,23 +100,23 @@ You can modify the environment variables in the **.cdk-stack-dev.env** file.
 
 ```dotenv
 # Path: .cdk-stack-prod.env (for local development) for the martin ecs server
-AWS_ACCOUNT_ID=811478435729
-AWS_DEFAULT_REGION=ap-southeast-1
+AWS_ACCOUNT_ID=<AWS_ACCOUNT_ID>
+AWS_DEFAULT_REGION=<AWS_DEFAULT_REGION>
 
 # For the martin-eoapi-service
-VPC_ID=vpc-09a86d723258c009e
-EXECUTION_ROLE_ARN=arn:aws:iam::811478435729:role/ECSTaskExecutionRole
+VPC_ID=vpc-<VPC_ID>
+EXECUTION_ROLE_ARN=arn:aws:iam::<AWS_ACCOUNT_ID>:role/martin-eoapi-service-role
 CLUSTER_NAME=cluster-martin-eoapi-service
 ECS_CPU=4096
 ECS_MEMORY=8192
-API_NAME=martin-eoapi-service
-LOAD_BALANCER_NAME=martin-eoapi-alb-dev
+API_NAME=martin-service
+LOAD_BALANCER_NAME=martin-alb-dev
 SERVICE_NAME=martin-eoapi-dev-service
-IMAGE_URI="811478435729.dkr.ecr.ap-southeast-1.amazonaws.com/martin-eoapi-dev:latest"
+IMAGE_URI="<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_DEFAULT_REGION>.amazonaws.com/martin-eoapi-dev:latest"
 STACK_NAME=martin-eoapi-service
 ASSIGN_PUBLIC_IP=false
 PRIVATE_WITH_NAT=true
-SUBNET_ID="subnet-09fbe2ab7fe358c75""
+SUBNET_ID="subnet-<SUBNET_ID>,subnet-<SUBNET_ID>,subnet-<SUBNET_ID>""
 ```
 
 ## First Time Setup
